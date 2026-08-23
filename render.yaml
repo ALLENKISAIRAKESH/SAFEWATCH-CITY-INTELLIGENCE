@@ -1,0 +1,23 @@
+services:
+  # SafeWatch Frontend Static Site
+  - type: web
+    name: safewatch-mission-control
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # SafeWatch AI Vision & SocketIO Backend (Optional)
+  - type: web
+    name: safewatch-backend-engine
+    env: python
+    buildCommand: pip install -r backend_requirements.txt
+    startCommand: python backend.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: BACKEND_PORT
+        value: 5000
