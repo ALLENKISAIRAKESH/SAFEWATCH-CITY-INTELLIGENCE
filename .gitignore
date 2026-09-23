@@ -1,29 +1,75 @@
-# Logs
-logs
-*.log
+# ──────────────────────────────────────────────
+# SafeWatch — .gitignore
+# ──────────────────────────────────────────────
+
+# ── Node.js ──────────────────────────────────
+node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+.npm
+.yarn
 
-node_modules
-dist
-dist-ssr
+# ── Build output ─────────────────────────────
+dist/
+dist-ssr/
+build/
 *.local
-.venv
-venv
-__pycache__
-*.pyc
 
-# Editor directories and files
+# ── Python ───────────────────────────────────
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+.eggs/
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+.Python
+
+# ── YOLO model weights (large binary files) ──
+*.pt
+*.onnx
+*.weights
+# To include a model: uncomment and pin exact file
+# !yolov8n.pt
+
+# ── Environment & secrets ────────────────────
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets.json
+
+# ── Editor & OS files ────────────────────────
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-.env
+
+# ── Logs ─────────────────────────────────────
+logs/
+*.log
+
+# ── Testing ──────────────────────────────────
+coverage/
+.nyc_output/
+
+# ── Misc ─────────────────────────────────────
+.cache/
+.parcel-cache/
+.turbo/
