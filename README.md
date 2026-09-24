@@ -311,7 +311,3 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide.
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
-
----
-
-*Built for HackITx MRDU Hackathon*
