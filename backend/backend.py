@@ -11,7 +11,11 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load shared .env from project root (one level up from backend/), then
+# optionally overlay with a backend-local .env for environment-specific overrides.
+_root_env = os.path.join(os.path.dirname(__file__), '..', '.env')
+load_dotenv(dotenv_path=_root_env)
+load_dotenv()  # also load backend/.env if present (overrides root)
 
 try:
     from ultralytics import YOLO
