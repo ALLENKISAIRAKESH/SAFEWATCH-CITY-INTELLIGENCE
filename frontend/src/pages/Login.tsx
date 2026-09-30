@@ -65,13 +65,16 @@ const Login: React.FC = () => {
             <Car className="w-8 h-8 text-cyan-400" />
           </div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">SIH-26127</h1>
-            <span className="bg-cyan-500/20 text-cyan-300 text-xs font-mono px-2 py-0.5 rounded border border-cyan-500/40 font-bold">
-              2024
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">SafeWatch</h1>
+            <span className="bg-sky-500/20 text-sky-300 text-xs font-mono px-2 py-0.5 rounded border border-sky-500/40 font-bold">
+              PS-26127
             </span>
           </div>
-          <p className="text-cyan-400/80 text-xs font-mono mt-1.5 text-center">
-            Smart India Hackathon · AI Vehicle Intelligence & Traffic Surveillance
+          <p className="text-sky-400 font-semibold text-sm font-mono mt-1 text-center">
+            City Intelligence
+          </p>
+          <p className="text-slate-400 text-xs font-mono mt-1 text-center">
+            AI Multi-Camera ANPR & Urban Traffic Surveillance Platform
           </p>
         </div>
 

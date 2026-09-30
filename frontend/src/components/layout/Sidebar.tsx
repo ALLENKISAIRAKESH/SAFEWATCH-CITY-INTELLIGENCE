@@ -90,10 +90,10 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, onToggle }) => {
         {!collapsed && (
           <div className="overflow-hidden">
             <div className="flex items-center gap-1.5">
-              <span className="text-white font-extrabold text-base leading-tight tracking-tight whitespace-nowrap">SIH-26127</span>
-              <span className="bg-cyan-500/20 text-cyan-300 text-[9px] font-mono px-1.5 py-0.5 rounded border border-cyan-500/40 font-bold">2024</span>
+              <span className="text-white font-extrabold text-base leading-tight tracking-tight whitespace-nowrap">SafeWatch</span>
+              <span className="bg-sky-500/20 text-sky-300 text-[8px] font-mono px-1 py-0.5 rounded border border-sky-500/30 font-semibold">PS-26127</span>
             </div>
-            <div className="text-cyan-400/80 text-[10px] font-mono font-medium whitespace-nowrap">Vehicle Intelligence</div>
+            <div className="text-sky-400 text-[10px] font-mono font-medium whitespace-nowrap">City Intelligence</div>
           </div>
         )}
       </div>

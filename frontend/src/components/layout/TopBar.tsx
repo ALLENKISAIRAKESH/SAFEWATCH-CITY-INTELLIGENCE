@@ -8,23 +8,23 @@ import PitchDemoControllerModal from '@/components/PitchDemoControllerModal';
 import GlobalHotkeysModal from '@/components/GlobalHotkeysModal';
 
 const PAGE_TITLES: Record<string, { title: string; crumbs: string[] }> = {
-  '/': { title: 'SIH26127 — Vehicle Intelligence Mission Control', crumbs: ['SIH 2024', 'Mission Control'] },
-  '/vehicle-intelligence': { title: 'SIH26127 — Vehicle Intelligence Mission Control', crumbs: ['SIH 2024', 'Overview'] },
-  '/live-anpr': { title: 'Live ANPR & Multi-Camera Detection Stream', crumbs: ['SIH26127', 'Phase 1', 'Live ANPR'] },
-  '/search': { title: 'Vehicle Search & Trajectory Reconstruction', crumbs: ['SIH26127', 'Phase 4', 'Search & Trajectory'] },
-  '/vehicle-search': { title: 'Vehicle Search & Trajectory Reconstruction', crumbs: ['SIH26127', 'Phase 4', 'Search & Trajectory'] },
-  '/associations': { title: 'Cross-Camera Association & Vehicle Re-ID', crumbs: ['SIH26127', 'Phase 3', 'Identity Graph'] },
-  '/cross-camera': { title: 'Cross-Camera Association & Vehicle Re-ID', crumbs: ['SIH26127', 'Phase 3', 'Identity Graph'] },
-  '/watchlists': { title: 'Vehicle Watchlists & Stolen Hotlist Alerts', crumbs: ['SIH26127', 'Phase 6', 'Hotlist Matching'] },
-  '/traffic': { title: 'Urban Traffic Flow Analytics, Density & OD Matrix', crumbs: ['SIH26127', 'Phase 5', 'Traffic Flow'] },
-  '/traffic-analytics': { title: 'Urban Traffic Flow Analytics, Density & OD Matrix', crumbs: ['SIH26127', 'Phase 5', 'Traffic Flow'] },
-  '/anomalies': { title: 'Route Plausibility & Impossible Transition Alerts', crumbs: ['SIH26127', 'Phase 6', 'Anomalies'] },
-  '/anomaly-alerts': { title: 'Route Plausibility & Impossible Transition Alerts', crumbs: ['SIH26127', 'Phase 6', 'Anomalies'] },
-  '/evaluation': { title: 'ANPR Pipeline Benchmark & Accuracy Metrics (CER, FPS)', crumbs: ['SIH26127', 'Phase 7', 'Evaluation'] },
-  '/anpr-evaluation': { title: 'ANPR Pipeline Benchmark & Accuracy Metrics (CER, FPS)', crumbs: ['SIH26127', 'Phase 7', 'Evaluation'] },
-  '/cameras': { title: 'City Traffic Camera Network & Topology', crumbs: ['Infrastructure', 'Cameras'] },
-  '/sources': { title: 'City Traffic Camera Network & Topology', crumbs: ['Infrastructure', 'Cameras'] },
-  '/evidence': { title: 'Vehicle Sighting Evidence & Plate Snapshot Vault', crumbs: ['Forensics', 'Evidence'] },
+  '/': { title: 'SafeWatch — City Intelligence Mission Control', crumbs: ['City Intelligence', 'Mission Control'] },
+  '/vehicle-intelligence': { title: 'SafeWatch — City Intelligence Mission Control', crumbs: ['City Intelligence', 'Overview'] },
+  '/live-anpr': { title: 'Live ANPR & Multi-Camera Detection Stream', crumbs: ['Live Surveillance', 'ANPR Feeds'] },
+  '/search': { title: 'Vehicle Search & Trajectory Reconstruction', crumbs: ['Forensic Search', 'Trajectory'] },
+  '/vehicle-search': { title: 'Vehicle Search & Trajectory Reconstruction', crumbs: ['Forensic Search', 'Trajectory'] },
+  '/associations': { title: 'Cross-Camera Association & Vehicle Re-ID', crumbs: ['Vehicle Re-ID', 'Identity Graph'] },
+  '/cross-camera': { title: 'Cross-Camera Association & Vehicle Re-ID', crumbs: ['Vehicle Re-ID', 'Identity Graph'] },
+  '/watchlists': { title: 'Vehicle Watchlists & Stolen Hotlist Alerts', crumbs: ['Law Enforcement', 'Hotlist Alerts'] },
+  '/traffic': { title: 'Urban Traffic Flow Analytics, Density & OD Matrix', crumbs: ['Urban Analytics', 'OD Matrix'] },
+  '/traffic-analytics': { title: 'Urban Traffic Flow Analytics, Density & OD Matrix', crumbs: ['Urban Analytics', 'OD Matrix'] },
+  '/anomalies': { title: 'Route Plausibility & Impossible Transition Alerts', crumbs: ['Threat Detection', 'Route Anomalies'] },
+  '/anomaly-alerts': { title: 'Route Plausibility & Impossible Transition Alerts', crumbs: ['Threat Detection', 'Route Anomalies'] },
+  '/evaluation': { title: 'ANPR Pipeline Benchmark & Accuracy Metrics (CER, FPS)', crumbs: ['AI Pipeline', 'Model Benchmarks'] },
+  '/anpr-evaluation': { title: 'ANPR Pipeline Benchmark & Accuracy Metrics (CER, FPS)', crumbs: ['AI Pipeline', 'Model Benchmarks'] },
+  '/cameras': { title: 'City Traffic Camera Network & Topology', crumbs: ['Infrastructure', 'Camera Network'] },
+  '/sources': { title: 'City Traffic Camera Network & Topology', crumbs: ['Infrastructure', 'Camera Network'] },
+  '/evidence': { title: 'Vehicle Sighting Evidence & Plate Snapshot Vault', crumbs: ['Evidence Vault', 'Plate Archive'] },
   '/audit-logs': { title: 'ANPR Query & Law Enforcement Audit Trail', crumbs: ['Compliance', 'Audit Trail'] },
   '/settings': { title: 'ANPR Pipeline & System Configuration', crumbs: ['System', 'Settings'] },
 };
@@ -56,7 +56,7 @@ const TopBar: React.FC = () => {
     (k) => k !== '/' && location.pathname.startsWith(k)
   ) ?? (location.pathname === '/' ? '/' : '/');
 
-  const pageInfo = PAGE_TITLES[pageKey] ?? { title: 'SIH 26127 — Vehicle Intelligence Platform', crumbs: ['SIH 2024', 'Vehicle Intelligence'] };
+  const pageInfo = PAGE_TITLES[pageKey] ?? { title: 'SafeWatch City Intelligence', crumbs: ['SafeWatch', 'City Intelligence'] };
 
   const formattedTime = time.toLocaleTimeString('en-US', {
     hour12: false,
@@ -79,15 +79,15 @@ const TopBar: React.FC = () => {
   };
 
   return (
-    <header className="h-14 bg-[#080e1a]/95 border-b border-white/[0.07] flex items-center px-4 gap-4 backdrop-blur-md relative z-40">
+    <header className="h-14 bg-[#080e1a]/95 border-b border-white/[0.07] flex items-center px-4 gap-3 backdrop-blur-md relative z-40 justify-between">
       {/* Left — Title & Breadcrumb */}
-      <div className="flex flex-col justify-center min-w-0">
-        <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-mono">
-          <span className="text-cyan-400 font-bold">SIH 26127</span>
+      <div className="flex flex-col justify-center min-w-0 max-w-sm flex-shrink">
+        <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-mono truncate">
+          <span className="text-sky-400 font-bold">SafeWatch</span>
           {pageInfo.crumbs.map((c, i) => (
             <React.Fragment key={i}>
-              <ChevronRight className="w-3 h-3 text-slate-600" />
-              <span className={i === pageInfo.crumbs.length - 1 ? 'text-sky-400 font-semibold' : ''}>{c}</span>
+              <ChevronRight className="w-3 h-3 text-slate-600 flex-shrink-0" />
+              <span className={i === pageInfo.crumbs.length - 1 ? 'text-sky-300 font-semibold' : ''}>{c}</span>
             </React.Fragment>
           ))}
         </div>
@@ -95,8 +95,8 @@ const TopBar: React.FC = () => {
       </div>
 
       {/* Center — Search */}
-      <div className="flex-1 flex justify-center">
-        <form onSubmit={handleSearchSubmit} className={`relative transition-all duration-300 ${searchOpen ? 'w-80' : 'w-64'}`}>
+      <div className="flex-1 max-w-md mx-2 hidden sm:flex justify-center">
+        <form onSubmit={handleSearchSubmit} className="w-full relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
           <input
             id="topbar-search"
@@ -112,20 +112,20 @@ const TopBar: React.FC = () => {
       </div>
 
       {/* Right — Status + Audio + Notifications + Time + Avatar */}
-      <div className="flex items-center gap-3 flex-shrink-0">
+      <div className="flex items-center gap-2.5 flex-shrink-0">
         {/* Audio Announcer */}
         <AudioVoiceAnnouncer />
 
-        {/* SIH26127 Badge */}
-        <div className="flex items-center gap-1.5 text-xs font-mono text-sky-400 bg-sky-500/10 border border-sky-500/30 px-2.5 py-1 rounded-lg">
+        {/* Problem Statement Badge */}
+        <div className="hidden lg:flex items-center gap-1.5 text-xs font-mono text-sky-400 bg-sky-500/10 border border-sky-500/30 px-2.5 py-1 rounded-lg">
           <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />
-          <span className="font-bold">SIH 26127</span>
+          <span className="font-bold">SIH-26127</span>
         </div>
 
         {/* Real-time ANPR Pipeline Badge */}
-        <div className="flex items-center gap-1.5 text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
+        <div className="hidden md:flex items-center gap-1.5 text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="hidden sm:inline">ANPR Pipeline Online</span>
+          <span>Pipeline Online</span>
         </div>
 
         {/* Hotkeys HUD Button */}

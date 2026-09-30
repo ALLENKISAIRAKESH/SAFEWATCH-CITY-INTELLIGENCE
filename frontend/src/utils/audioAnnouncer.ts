@@ -200,7 +200,7 @@ class AudioAnnouncerEngine {
 
   public testBroadcast() {
     this.unlockAudio();
-    this.speakVoiceAlert('SIH 26127 Vehicle Intelligence Command: AI Voice Announcer operational. All surveillance channels active.', true);
+    this.speakVoiceAlert('SafeWatch City Intelligence Command: AI Voice Announcer operational. All surveillance channels active.', true);
   }
 }
 

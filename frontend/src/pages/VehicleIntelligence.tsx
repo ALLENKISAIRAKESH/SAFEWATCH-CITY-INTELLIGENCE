@@ -176,13 +176,13 @@ export default function VehicleIntelligence() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold tracking-tight">SIH-26127 AI Vehicle Intelligence & Traffic Surveillance</h1>
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded border border-cyan-500/30 bg-cyan-500/10 text-cyan-300">
-                  SMART INDIA HACKATHON 2024
+                <h1 className="text-xl font-bold tracking-tight text-white">SafeWatch City Intelligence</h1>
+                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded border border-sky-500/30 bg-sky-500/10 text-sky-300">
+                  SIH-26127 AI PLATFORM
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                City-scale automated number plate recognition (ANPR), cross-camera identity tracking, hotlist matching, and route anomaly detection
+                City-scale automated number plate recognition (ANPR), cross-camera vehicle trajectory reconstruction, hotlists, and traffic flow intelligence
               </p>
             </div>
           </div>
