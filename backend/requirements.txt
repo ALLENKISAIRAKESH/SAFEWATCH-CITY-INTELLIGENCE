@@ -9,3 +9,13 @@ python-dotenv==1.1.1
 pymongo==4.17.0
 dnspython==2.8.0
 
+# Phase 1 — ANPR Foundation
+easyocr==1.7.2
+Pillow==11.1.0
+
+# Phase 2 — Vehicle Tracking (pre-staged)
+supervision==0.25.1
+
+# Phase 4–5 — Trajectory + Traffic Analytics (optional)
+# shapely==2.0.6
+# scipy==1.15.0

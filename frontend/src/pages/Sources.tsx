@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Eye, Settings, Power, Camera, Wifi, Clock, Zap, Trash2, Check, X, Play, RefreshCw, Scan } from 'lucide-react';
+import { Plus, Eye, Settings, Power, Camera, Wifi, Clock, Zap, Trash2, Check, X, RefreshCw, Scan, MapPin } from 'lucide-react';
 import { MOCK_SOURCES, SOURCE_STATUS_COLORS, SourceStatus } from '@/data/mockData';
 import AIOCRScannerModal from '@/components/AIOCRScannerModal';
 
@@ -33,15 +33,14 @@ const Sources: React.FC = () => {
   const [testingStream, setTestingStream] = useState<any | null>(null);
   const [testResult, setTestResult] = useState<string | null>(null);
 
-
   const [form, setForm] = useState({
     name: '',
-    type: 'IP Camera',
+    type: 'Junction ANPR Camera',
     location: '',
     url: '',
-    aiModel: 'Person Detection v1.0.3',
+    aiModel: 'ANPR Indian Plate OCR Engine v2.4',
     fps: 30,
-    latency: 35,
+    latency: 28,
   });
 
   useEffect(() => {
@@ -54,12 +53,12 @@ const Sources: React.FC = () => {
     setEditingSource(null);
     setForm({
       name: '',
-      type: 'IP Camera',
+      type: 'Junction ANPR Camera',
       location: '',
       url: '',
-      aiModel: 'Person Detection v1.0.3',
+      aiModel: 'ANPR Indian Plate OCR Engine v2.4',
       fps: 30,
-      latency: 35,
+      latency: 28,
     });
     setShowModal(true);
   };
@@ -70,10 +69,10 @@ const Sources: React.FC = () => {
       name: src.name,
       type: src.type,
       location: src.location,
-      url: src.url || 'rtsp://192.168.1.100/stream',
+      url: src.url || 'rtsp://city-traffic.net/stream/cam-01',
       aiModel: src.aiModel,
       fps: src.fps || 30,
-      latency: src.latency || 40,
+      latency: src.latency || 30,
     });
     setShowModal(true);
   };
@@ -123,10 +122,10 @@ const Sources: React.FC = () => {
 
   const runStreamTest = (src: any) => {
     setTestingStream(src);
-    setTestResult('Testing RTSP / HLS handshake...');
+    setTestResult('Connecting to traffic camera node and initializing ANPR pipeline...');
     setTimeout(() => {
-      setTestResult(`Connection Established! Latency: ${src.latency || 42}ms · Resolution: 1920x1080 @ ${src.fps || 30} FPS · YOLOv8 Stream OK`);
-    }, 1200);
+      setTestResult(`Connection Established! Latency: ${src.latency || 28}ms · 1080p @ ${src.fps || 30} FPS · Multi-Frame Consensus OCR Ready`);
+    }, 1000);
   };
 
   return (
@@ -134,21 +133,21 @@ const Sources: React.FC = () => {
       {/* Stream Test Modal */}
       {testingStream && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0d1526] border border-white/15 rounded-2xl p-6 w-full max-w-lg shadow-2xl animate-fade-in">
+          <div className="bg-[#0d1526] border border-white/15 rounded-2xl p-6 w-full max-w-lg shadow-2xl animate-fade-in font-mono">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
               <div className="flex items-center gap-2">
                 <Wifi className="w-4 h-4 text-emerald-400" />
-                <h3 className="font-semibold text-white text-sm">Stream Diagnostic: {testingStream.name}</h3>
+                <h3 className="font-semibold text-white text-sm">Traffic Camera Stream Diagnostic: {testingStream.name}</h3>
               </div>
               <button onClick={() => { setTestingStream(null); setTestResult(null); }} className="text-slate-400 hover:text-white">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="aspect-video bg-black rounded-xl relative overflow-hidden flex items-center justify-center border border-white/10 mb-4">
-              <div className="text-center">
+            <div className="aspect-video bg-black rounded-xl relative overflow-hidden flex items-center justify-center border border-white/10 mb-4 p-4 text-center">
+              <div>
                 <RefreshCw className="w-8 h-8 text-sky-400 mx-auto mb-2 animate-spin" />
-                <span className="text-xs font-mono text-slate-400">{testResult}</span>
+                <span className="text-xs text-slate-300">{testResult}</span>
               </div>
             </div>
 
@@ -164,31 +163,35 @@ const Sources: React.FC = () => {
         </div>
       )}
 
-      {/* AI OCR & ALPR Scanner Modal */}
+      {/* AI OCR Scanner Modal */}
       <AIOCRScannerModal isOpen={showOcrModal} onClose={() => setShowOcrModal(false)} />
 
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-white">Monitoring Sources & Sensors</h2>
-          <p className="text-sm text-slate-500">Manage video feeds, RTSP streams, ALPR OCR sensors, and drone payloads</p>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white">City Traffic Camera Network & Topology</h2>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 border border-sky-500/30 text-sky-300 font-bold">
+              SIH26127
+            </span>
+          </div>
+          <p className="text-sm text-slate-500">Manage city-wide ANPR sensor nodes, RTSP junction streams, and geometric camera calibration</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowOcrModal(true)}
             className="flex items-center gap-2 px-3.5 py-2 bg-sky-500/15 border border-sky-500/30 text-sky-400 text-sm font-semibold rounded-lg hover:bg-sky-500/25 transition-colors shadow-lg shadow-sky-500/10"
           >
-            <Scan className="w-4 h-4" /> AI OCR / ALPR
+            <Scan className="w-4 h-4" /> Test Plate OCR
           </button>
           <button
             onClick={handleOpenCreate}
             className="flex items-center gap-2 px-4 py-2 bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold rounded-lg transition-colors shadow-lg shadow-sky-500/25"
           >
-            <Plus className="w-4 h-4" /> Add Source
+            <Plus className="w-4 h-4" /> Add Camera Node
           </button>
         </div>
       </div>
-
 
       {/* Source Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -208,12 +211,17 @@ const Sources: React.FC = () => {
             </div>
 
             <div className="space-y-1.5 mb-4">
-              <div className="text-xs text-slate-400">{src.type} · <span className="text-slate-500">{src.location}</span></div>
+              <div className="text-xs text-slate-400 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                <span>{src.type}</span>
+                <span>·</span>
+                <span className="text-slate-400 font-mono">{src.location}</span>
+              </div>
               
               <div className="grid grid-cols-3 gap-2 mt-3">
                 {[
                   { icon: Zap, label: `${src.fps || 30} FPS` },
-                  { icon: Wifi, label: `${src.latency || 40}ms` },
+                  { icon: Wifi, label: `${src.latency || 28}ms` },
                   { icon: Clock, label: src.status === 'online' ? 'Active' : 'Offline' },
                 ].map((stat, i) => (
                   <div key={i} className="bg-white/[0.04] rounded-lg p-2 text-center">
@@ -222,13 +230,15 @@ const Sources: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <div className="text-[10px] font-mono text-slate-500 mt-2 truncate">{src.aiModel}</div>
+              <div className="text-[10px] font-mono text-sky-400/80 mt-2 truncate bg-sky-950/30 px-2 py-1 rounded border border-sky-500/10">
+                {src.aiModel}
+              </div>
             </div>
 
             <div className="flex gap-2">
               <button
                 onClick={() => runStreamTest(src)}
-                className="flex-1 py-1.5 bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs rounded-lg hover:bg-sky-500/20 transition-colors flex items-center justify-center gap-1"
+                className="flex-1 py-1.5 bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs rounded-lg hover:bg-sky-500/20 transition-colors flex items-center justify-center gap-1 font-mono"
               >
                 <Eye className="w-3 h-3" /> Test Stream
               </button>
@@ -240,7 +250,7 @@ const Sources: React.FC = () => {
               </button>
               <button
                 onClick={() => toggleSourcePower(src.id)}
-                title={src.status === 'online' ? 'Disable Source' : 'Enable Source'}
+                title={src.status === 'online' ? 'Disable Camera' : 'Enable Camera'}
                 className={`py-1.5 px-2.5 border text-xs rounded-lg transition-colors flex items-center gap-1 ${src.status === 'online' ? 'bg-red-500/10 border-red-500/20 text-red-400 hover:bg-red-500/20' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20'}`}
               >
                 <Power className="w-3 h-3" />
@@ -261,7 +271,7 @@ const Sources: React.FC = () => {
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#0d1526] border border-white/15 rounded-2xl p-6 w-full max-w-md shadow-2xl animate-fade-in">
             <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
-              <h3 className="text-lg font-bold text-white">{editingSource ? 'Configure Source' : 'Add Monitoring Source'}</h3>
+              <h3 className="text-lg font-bold text-white">{editingSource ? 'Configure Camera Node' : 'Add Traffic Camera Node'}</h3>
               <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
@@ -269,11 +279,11 @@ const Sources: React.FC = () => {
 
             <form onSubmit={handleSaveSource} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">Source Name</label>
+                <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">Camera / Junction Name</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Camera 05 — Warehouse Exit"
+                  placeholder="e.g. Camera 05 — South Bypass Gate"
                   value={form.name}
                   onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                   className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500/40"
@@ -281,11 +291,11 @@ const Sources: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">Location</label>
+                <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">Roadway / Intersection Location</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Warehouse Bay 2"
+                  placeholder="e.g. Ring Road Junction (Northbound)"
                   value={form.location}
                   onChange={(e) => setForm((p) => ({ ...p, location: e.target.value }))}
                   className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500/40"
@@ -296,34 +306,48 @@ const Sources: React.FC = () => {
                 <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">RTSP / HLS Stream URL</label>
                 <input
                   type="text"
-                  placeholder="rtsp://192.168.1.120:554/live"
+                  placeholder="rtsp://city-traffic.net/stream/cam-05"
                   value={form.url}
                   onChange={(e) => setForm((p) => ({ ...p, url: e.target.value }))}
-                  className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500/40"
+                  className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-3 py-2 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-sky-500/40 font-mono text-xs"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">Source Type</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">Sensor Type</label>
                   <select
                     value={form.type}
                     onChange={(e) => setForm((p) => ({ ...p, type: e.target.value }))}
-                    className="w-full bg-[#0a1120] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500/40"
+                    className="w-full bg-[#0a1120] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500/40"
                   >
-                    {['IP Camera', 'CCTV', 'PTZ Camera', 'Thermal', 'Drone', 'Webcam'].map((t) => (
+                    {[
+                      'Junction ANPR Camera',
+                      'Overhead Gantry',
+                      'PTZ Traffic Dome',
+                      'Highway Speed Trap',
+                      'Toll Booth Sensor'
+                    ].map((t) => (
                       <option key={t} value={t}>{t}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">Target FPS</label>
-                  <input
-                    type="number"
-                    value={form.fps}
-                    onChange={(e) => setForm((p) => ({ ...p, fps: parseInt(e.target.value) || 30 }))}
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-sky-500/40"
-                  />
+                  <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">AI Vision Pipeline</label>
+                  <select
+                    value={form.aiModel}
+                    onChange={(e) => setForm((p) => ({ ...p, aiModel: e.target.value }))}
+                    className="w-full bg-[#0a1120] border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500/40 truncate"
+                  >
+                    {[
+                      'ANPR Indian Plate OCR Engine v2.4',
+                      'Vehicle Flow & ANPR Tracker v2.0',
+                      'High-Speed Highway ANPR v3.1',
+                      'Heavy Vehicle Classifier v2.1'
+                    ].map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -339,7 +363,7 @@ const Sources: React.FC = () => {
                   type="submit"
                   className="flex-1 py-2 bg-sky-500 text-white text-sm font-semibold rounded-xl hover:bg-sky-400 transition-colors flex items-center justify-center gap-1.5"
                 >
-                  <Check className="w-4 h-4" /> {editingSource ? 'Save Changes' : 'Add Source'}
+                  <Check className="w-4 h-4" /> {editingSource ? 'Save Changes' : 'Add Camera Node'}
                 </button>
               </div>
             </form>
@@ -351,4 +375,3 @@ const Sources: React.FC = () => {
 };
 
 export default Sources;
-

@@ -55,8 +55,13 @@ const AuditLogs: React.FC = () => {
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-bold text-white">SOC Audit & Compliance Trail</h2>
-          <p className="text-sm text-slate-500">Immutable ledger of security actions, user logins, and incident resolutions</p>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white">ANPR Query & Law Enforcement Audit Trail</h2>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 border border-sky-500/30 text-sky-300 font-bold">
+              SIH26127 AUDIT
+            </span>
+          </div>
+          <p className="text-sm text-slate-500">Immutable ledger of license plate searches, hotlist alert dispatches, and trajectory reconstructions</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1.5 rounded-lg text-xs font-mono">

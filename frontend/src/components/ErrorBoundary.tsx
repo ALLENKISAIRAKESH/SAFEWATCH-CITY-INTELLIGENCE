@@ -21,7 +21,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('[SafeWatch System Sentinel] Uncaught runtime exception caught:', error, errorInfo);
+    console.error('[SIH-26127 Sentinel] Uncaught runtime exception caught:', error, errorInfo);
   }
 
   public handleReload = () => {
@@ -30,8 +30,8 @@ class ErrorBoundary extends Component<Props, State> {
 
   public handleResetState = () => {
     try {
+      localStorage.removeItem('sih26127_live_incidents');
       localStorage.removeItem('safewatch_live_incidents');
-      localStorage.removeItem('safewatch_live_audit_logs');
     } catch (_) {}
     window.location.href = '/';
   };
@@ -46,7 +46,7 @@ class ErrorBoundary extends Component<Props, State> {
             </div>
 
             <div>
-              <h2 className="text-lg font-bold text-white">SafeWatch Sentinel Recovery</h2>
+              <h2 className="text-lg font-bold text-white">SIH-26127 Sentinel Recovery</h2>
               <p className="text-xs text-slate-400 mt-1">
                 A component render exception was intercepted and contained by the system boundary.
               </p>

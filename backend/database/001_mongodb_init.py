@@ -68,6 +68,47 @@ def init_db():
     db.audit_logs.create_index([("timestamp", DESCENDING)])
     db.audit_logs.create_index([("actor", ASCENDING)])
 
+    # ─── SIH26127 ANPR Collections (Phase 1–7) ──────────────────────────
+
+    # Plates — unique normalized plate registry
+    db.plates.create_index([("normalized_plate", ASCENDING)], unique=True, background=True)
+    db.plates.create_index([("last_seen", DESCENDING)], background=True)
+
+    # Sightings — multi-frame confirmed plate readings
+    db.sightings.create_index([("normalized_plate", ASCENDING), ("timestamp", DESCENDING)], background=True)
+    db.sightings.create_index([("camera_id", ASCENDING), ("timestamp", DESCENDING)], background=True)
+    db.sightings.create_index([("timestamp_epoch", DESCENDING)], background=True)
+    db.sightings.create_index([("id", ASCENDING)], unique=True, background=True)
+
+    # Watchlists
+    db.watchlists.create_index([("plate", ASCENDING)], unique=True, background=True)
+    db.watchlists.create_index([("type", ASCENDING)], background=True)
+    db.watchlists.create_index([("priority", ASCENDING)], background=True)
+    db.watchlists.create_index([("active", ASCENDING)], background=True)
+
+    # Cross-Camera Associations (Phase 3)
+    db.associations.create_index([("anchor_plate", ASCENDING), ("created_at", DESCENDING)], background=True)
+    db.associations.create_index([("decision", ASCENDING)], background=True)
+
+    # Cameras / Topology (Phase 3)
+    db.cameras.create_index([("id", ASCENDING)], unique=True, background=True)
+
+    # Anomaly Events (Phase 6)
+    db.anomaly_events.create_index([("plate", ASCENDING), ("timestamp", DESCENDING)], background=True)
+    db.anomaly_events.create_index([("anomaly_type", ASCENDING)], background=True)
+    db.anomaly_events.create_index([("severity", ASCENDING)], background=True)
+    db.anomaly_events.create_index([("resolved", ASCENDING)], background=True)
+
+    # ANPR Evaluation Runs (Phase 7)
+    db.anpr_evaluations.create_index([("started_at", DESCENDING)], background=True)
+    db.anpr_evaluations.create_index([("status", ASCENDING)], background=True)
+
+    # Traffic Snapshots (Phase 5)
+    db.traffic_snapshots.create_index([("camera_id", ASCENDING), ("timestamp", DESCENDING)], background=True)
+    db.od_flows.create_index([("origin_camera", ASCENDING), ("destination_camera", ASCENDING)], background=True)
+
+    print(" -> SIH26127 ANPR/Watchlist/Anomaly/Trajectory indexes created.")
+
     # ─── 2. Seed Initial Core Data ──────────────────────────────────────
     print("Seeding initial data if empty...")
 

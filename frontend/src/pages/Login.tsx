@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Eye, EyeOff, AlertCircle, Loader2, Lock, User } from 'lucide-react';
+import { Shield, Car, Eye, EyeOff, AlertCircle, Loader2, Lock, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Login: React.FC = () => {
@@ -15,8 +15,8 @@ const Login: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<'admin' | 'operator' | null>(null);
 
   const QUICK_CREDS = {
-    admin: { email: 'admin@safewatch.io', password: 'admin123' },
-    operator: { email: 'operator@safewatch.io', password: 'ops123' },
+    admin: { email: 'admin@sih26127.gov.in', password: 'admin123' },
+    operator: { email: 'operator@sih26127.gov.in', password: 'ops123' },
   };
 
   const handleQuickSelect = (role: 'admin' | 'operator') => {
@@ -61,11 +61,18 @@ const Login: React.FC = () => {
       <div className="relative z-10 w-full max-w-md px-6">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-sky-500/10 border border-sky-500/30 mb-4 shadow-[0_0_30px_rgba(56,189,248,0.15)]">
-            <Shield className="w-8 h-8 text-sky-400" />
+          <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 mb-4 shadow-[0_0_30px_rgba(6,182,212,0.2)]">
+            <Car className="w-8 h-8 text-cyan-400" />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">SafeWatch</h1>
-          <p className="text-sky-400/70 text-sm font-mono mt-1">AI Safety Operations Platform</p>
+          <div className="flex items-center gap-2">
+            <h1 className="text-3xl font-extrabold text-white tracking-tight">SIH-26127</h1>
+            <span className="bg-cyan-500/20 text-cyan-300 text-xs font-mono px-2 py-0.5 rounded border border-cyan-500/40 font-bold">
+              2024
+            </span>
+          </div>
+          <p className="text-cyan-400/80 text-xs font-mono mt-1.5 text-center">
+            Smart India Hackathon · AI Vehicle Intelligence & Traffic Surveillance
+          </p>
         </div>
 
         {/* Role Quick Select */}
@@ -183,8 +190,8 @@ const Login: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-xs text-slate-600 mt-6 font-mono">
-          SafeWatch AI v2.1.0 · HackITx 2026
+        <p className="text-center text-xs text-slate-500 mt-6 font-mono">
+          Smart India Hackathon 2024 · Problem Statement 26127 · AI Vehicle Intelligence
         </p>
       </div>
     </div>

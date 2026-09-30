@@ -10,8 +10,11 @@ import { audioAnnouncer } from '@/utils/audioAnnouncer';
 const BACKEND_URL = 'http://localhost:5000';
 
 export interface LiveMetrics {
-  peopleCount: number;
+  vehicleCount: number;
+  peopleCount?: number;
+  activePlatesCount: number;
   riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  congestionLevel: 'normal' | 'moderate' | 'heavy' | 'gridlock';
   activeSourcesCount: number;
   totalIncidentsCount: number;
   activeOperators: Array<{
@@ -25,6 +28,7 @@ export interface LiveMetrics {
 export interface StreamDetectionItem {
   id: string;
   label: string;
+  plateNumber?: string;
   score: number;
   source: string;
   trackId: string;
@@ -46,10 +50,9 @@ interface LiveDataContextType {
   appendAudit: (action: string, resource: string) => void;
   seedMockData: () => void;
   resetToFactoryDefaults: () => void;
-  emitClientDetection: (peopleCount: number, riskLevel: 'low' | 'medium' | 'high' | 'critical', sourceName: string) => void;
+  emitClientDetection: (vehicleCount: number, riskLevel: 'low' | 'medium' | 'high' | 'critical', sourceName: string) => void;
   isConnected: boolean;
 }
-
 
 const LiveDataContext = createContext<LiveDataContextType | null>(null);
 
@@ -81,16 +84,20 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
   });
 
   const [liveMetrics, setLiveMetrics] = useState<LiveMetrics>({
+    vehicleCount: 148,
     peopleCount: 0,
+    activePlatesCount: 84,
     riskLevel: 'low',
-    activeSourcesCount: 4,
+    congestionLevel: 'normal',
+    activeSourcesCount: 7,
     totalIncidentsCount: MOCK_INCIDENTS.length,
     activeOperators: [],
   });
 
   const [recentDetections, setRecentDetections] = useState<StreamDetectionItem[]>([
-    { id: '1', label: 'PERSON', score: 0.94, source: 'Camera 01 — Main Entrance', trackId: '#104', timestamp: new Date().toISOString() },
-    { id: '2', label: 'VEHICLE', score: 0.87, source: 'Camera 04 — Parking Area', trackId: '#V-12', timestamp: new Date(Date.now() - 15000).toISOString() },
+    { id: '1', label: 'CAR (WHITE SEDAN)', plateNumber: 'MH12DE1433', score: 0.96, source: 'Camera 02 — Ring Road Flyover', trackId: '#TRK-4402', timestamp: new Date().toISOString() },
+    { id: '2', label: 'SUV (SILVER HONDA)', plateNumber: 'DL01CA9999', score: 0.94, source: 'Camera 03 — Outer Expressway', trackId: '#TRK-8819', timestamp: new Date(Date.now() - 15000).toISOString() },
+    { id: '3', label: 'COMMERCIAL TRUCK', plateNumber: 'KA05MH7890', score: 0.98, source: 'Camera 04 — Downtown Terminal', trackId: '#TRK-3108', timestamp: new Date(Date.now() - 45000).toISOString() },
   ]);
 
   const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string | null>(() => {
@@ -100,6 +107,9 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
       return null;
     }
   });
+
+  // Cross-Tab Broadcast Channel
+  const broadcastRef = React.useRef<BroadcastChannel | null>(null);
 
   const handleSetUploadedVideoUrl = useCallback((url: string | null) => {
     setUploadedVideoUrl(url);
@@ -117,15 +127,11 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
     } catch (_) {}
   }, [incidents]);
 
-
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_LOGS_KEY, JSON.stringify(auditLogs));
     } catch (_) {}
   }, [auditLogs]);
-
-  // Cross-Tab Broadcast Channel
-  const broadcastRef = React.useRef<BroadcastChannel | null>(null);
 
   useEffect(() => {
     const channel = new BroadcastChannel('safewatch_sync');
@@ -160,9 +166,9 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     s.on('connect', () => {
       setIsConnected(true);
-      console.log('[SafeWatch Socket] Connected to AI Backend');
+      console.log('[SafeWatch Socket] Connected to SIH26127 ANPR Backend');
       if (user) {
-        s.emit('user_presence', { user, action: 'online', source: 'Web Dashboard' });
+        s.emit('user_presence', { user, action: 'online', source: 'Vehicle Intelligence Mission Control' });
       }
     });
 
@@ -179,33 +185,37 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
     s.on('incident_created', (inc: Incident) => {
       setIncidents((prev) => [inc, ...prev.filter((i) => i.id !== inc.id)]);
       broadcastRef.current?.postMessage({ type: 'INCIDENTS_UPDATE', payload: [inc, ...incidents] });
-      
+
       // Auto-trigger audio siren and vocal alert for critical / high threats
       if (inc.severity === 'critical' || inc.severity === 'high') {
-        audioAnnouncer.speakVoiceAlert(`Warning: ${inc.severity.toUpperCase()} security alert in ${inc.location || inc.source}: ${inc.title}`, true);
+        audioAnnouncer.speakVoiceAlert(`Warning: ${inc.severity.toUpperCase()} vehicle alert on ${inc.source}: ${inc.title}`, true);
       } else {
         audioAnnouncer.playAlertTone('warning');
       }
     });
-
 
     s.on('audit_log', (log: AuditLog) => {
       setAuditLogs((prev) => [log, ...prev].slice(0, 100));
       broadcastRef.current?.postMessage({ type: 'AUDIT_LOG_ADDED', payload: log });
     });
 
-    s.on('metrics_update', (metrics: LiveMetrics) => {
-      setLiveMetrics((prev) => ({ ...prev, ...metrics }));
+    s.on('metrics_update', (metrics: any) => {
+      setLiveMetrics((prev) => ({
+        ...prev,
+        ...metrics,
+        vehicleCount: metrics.vehicleCount ?? metrics.peopleCount ?? prev.vehicleCount,
+      }));
       broadcastRef.current?.postMessage({ type: 'METRICS_UPDATE', payload: metrics });
     });
 
     s.on('operator_stream_detection', (det: any) => {
       const item: StreamDetectionItem = {
         id: Math.random().toString(36).slice(2),
-        label: 'PERSON',
-        score: 0.92,
-        source: det.sourceName || 'Operator Camera',
-        trackId: `#${Math.floor(100 + Math.random() * 900)}`,
+        label: det.label || 'VEHICLE',
+        plateNumber: det.plateNumber || 'MH12DE1433',
+        score: det.score || 0.95,
+        source: det.sourceName || 'Traffic ANPR Camera',
+        trackId: `#TRK-${Math.floor(1000 + Math.random() * 9000)}`,
         timestamp: new Date().toISOString(),
         operatorName: det.operatorName,
       };
@@ -234,7 +244,7 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
     const entry: AuditLog = {
       id: `log-${Date.now().toString(36)}`,
       timestamp: new Date().toISOString(),
-      actor: user?.name || 'Operator',
+      actor: user?.name || 'Traffic Operator',
       action,
       resource,
       ip: '127.0.0.1',
@@ -245,7 +255,7 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
   }, [user]);
 
   const acknowledgeIncident = useCallback((id: string) => {
-    const actorName = user?.name || 'Operator';
+    const actorName = user?.name || 'Traffic Operator';
     setIncidents((prev) => {
       const updated = prev.map((inc) =>
         inc.id === id ? { ...inc, status: 'acknowledged' as IncidentStatus, assignedTo: actorName } : inc
@@ -253,14 +263,14 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
       broadcastRef.current?.postMessage({ type: 'INCIDENTS_UPDATE', payload: updated });
       return updated;
     });
-    appendAudit('Acknowledged Incident', id);
+    appendAudit('Acknowledged Vehicle Alert', id);
     if (socket && socket.connected) {
       socket.emit('action_acknowledge_incident', { incidentId: id, actor: actorName });
     }
   }, [user, socket, appendAudit]);
 
   const escalateIncident = useCallback((id: string) => {
-    const actorName = user?.name || 'Operator';
+    const actorName = user?.name || 'Traffic Operator';
     setIncidents((prev) => {
       const updated = prev.map((inc) =>
         inc.id === id ? { ...inc, status: 'escalated' as IncidentStatus, assignedTo: actorName } : inc
@@ -268,11 +278,11 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
       broadcastRef.current?.postMessage({ type: 'INCIDENTS_UPDATE', payload: updated });
       return updated;
     });
-    appendAudit('Escalated Incident', id);
+    appendAudit('Escalated Alert to Traffic Control HQ', id);
   }, [user, appendAudit]);
 
   const resolveIncident = useCallback((id: string) => {
-    const actorName = user?.name || 'Operator';
+    const actorName = user?.name || 'Traffic Operator';
     setIncidents((prev) => {
       const updated = prev.map((inc) =>
         inc.id === id ? { ...inc, status: 'resolved' as IncidentStatus } : inc
@@ -280,7 +290,7 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
       broadcastRef.current?.postMessage({ type: 'INCIDENTS_UPDATE', payload: updated });
       return updated;
     });
-    appendAudit('Resolved Incident', id);
+    appendAudit('Resolved Alert Case', id);
     if (socket && socket.connected) {
       socket.emit('action_resolve_incident', { incidentId: id, actor: actorName });
     }
@@ -292,25 +302,25 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
       title,
       severity,
       source,
-      rule: 'Manual Report',
+      rule: 'Operator Manual Alert',
       detectedAt: new Date().toISOString(),
       status: 'open',
       assignedTo: null,
-      trackId: `#${Math.floor(100 + Math.random() * 900)}`,
+      trackId: `#TRK-${Math.floor(1000 + Math.random() * 9000)}`,
       duration: '5 sec',
       description,
       evidenceId: `EVD-${Math.floor(100 + Math.random() * 900)}`,
-      zone: 'General Zone',
+      zone: 'Municipal Traffic Sector',
     };
     setIncidents((prev) => {
       const updated = [newInc, ...prev];
       broadcastRef.current?.postMessage({ type: 'INCIDENTS_UPDATE', payload: updated });
       return updated;
     });
-    appendAudit(`Created Incident: ${title}`, newInc.id);
+    appendAudit(`Created Vehicle Incident: ${title}`, newInc.id);
 
     // Audio alarm
-    audioAnnouncer.speakVoiceAlert(`Alert dispatched: ${title} in ${source}`, true);
+    audioAnnouncer.speakVoiceAlert(`Alert dispatched: ${title} at ${source}`, true);
   }, [appendAudit]);
 
   const seedMockData = useCallback(() => {
@@ -320,7 +330,7 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
       localStorage.setItem(STORAGE_INCIDENTS_KEY, JSON.stringify(MOCK_INCIDENTS));
       localStorage.setItem(STORAGE_LOGS_KEY, JSON.stringify(MOCK_AUDIT_LOGS));
     } catch (_) {}
-    appendAudit('Seeded 50+ Mock Incidents & Audit Records', 'Database');
+    appendAudit('Seeded 50+ ANPR Sightings & Vehicle Alert Records', 'Database');
   }, [appendAudit]);
 
   const resetToFactoryDefaults = useCallback(() => {
@@ -329,9 +339,12 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
     setIncidents(cleanIncidents);
     setAuditLogs(cleanLogs);
     setLiveMetrics({
+      vehicleCount: 120,
       peopleCount: 0,
+      activePlatesCount: 65,
       riskLevel: 'low',
-      activeSourcesCount: 4,
+      congestionLevel: 'normal',
+      activeSourcesCount: 7,
       totalIncidentsCount: cleanIncidents.length,
       activeOperators: [],
     });
@@ -342,19 +355,20 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
     appendAudit('Reset System to Factory Clean State', 'System Core');
   }, [appendAudit]);
 
-  const emitClientDetection = useCallback((peopleCount: number, riskLevel: 'low' | 'medium' | 'high' | 'critical', sourceName: string) => {
+  const emitClientDetection = useCallback((vehicleCount: number, riskLevel: 'low' | 'medium' | 'high' | 'critical', sourceName: string) => {
     setLiveMetrics((prev) => {
-      const updated = { ...prev, peopleCount, riskLevel };
+      const updated = { ...prev, vehicleCount, peopleCount: 0, riskLevel };
       broadcastRef.current?.postMessage({ type: 'METRICS_UPDATE', payload: updated });
       return updated;
     });
 
     if (socket && socket.connected) {
       socket.emit('client_detection', {
-        peopleCount,
+        vehicleCount,
+        peopleCount: 0,
         riskLevel,
         sourceName,
-        operatorName: user?.name || 'Operator',
+        operatorName: user?.name || 'Traffic Operator',
         timestamp: new Date().toISOString(),
       });
     }
@@ -380,7 +394,6 @@ export const LiveDataProvider: React.FC<{ children: ReactNode }> = ({ children }
         isConnected,
       }}
     >
-
       {children}
     </LiveDataContext.Provider>
   );

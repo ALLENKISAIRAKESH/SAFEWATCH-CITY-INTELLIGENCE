@@ -8,21 +8,23 @@ import { LiveDataProvider } from "@/contexts/LiveDataContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import AppShell from "@/components/layout/AppShell";
 import Login from "@/pages/Login";
-import CommandCenter from "@/pages/CommandCenter";
-import LiveMonitoring from "@/pages/LiveMonitoring";
-import Incidents from "@/pages/Incidents";
-import IncidentDetail from "@/pages/IncidentDetail";
+import NotFound from "@/pages/NotFound";
+
+// SIH26127 — Vehicle Intelligence Core Modules
+import VehicleIntelligence from "@/pages/VehicleIntelligence";
+import LiveANPR from "@/pages/LiveANPR";
+import VehicleSearch from "@/pages/VehicleSearch";
+import CrossCameraAssociation from "@/pages/CrossCameraAssociation";
+import Watchlists from "@/pages/Watchlists";
+import TrafficAnalytics from "@/pages/TrafficAnalytics";
+import AnomalyAlerts from "@/pages/AnomalyAlerts";
+import ANPREvaluation from "@/pages/ANPREvaluation";
+
+// Infrastructure & Forensics
 import Sources from "@/pages/Sources";
-import Zones from "@/pages/Zones";
-import Rules from "@/pages/Rules";
 import Evidence from "@/pages/Evidence";
-import Analytics from "@/pages/Analytics";
-import AIModels from "@/pages/AIModels";
-import RocketRidePipelines from "@/pages/RocketRidePipelines";
-import SuspectTracking from "@/pages/SuspectTracking";
 import AuditLogs from "@/pages/AuditLogs";
 import Settings from "@/pages/Settings";
-import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -39,20 +41,49 @@ const App = () => (
                 {/* Public */}
                 <Route path="/login" element={<Login />} />
 
-                {/* Protected — all wrapped in AppShell (which redirects to /login if not authed) */}
+                {/* Protected — wrapped in AppShell */}
                 <Route element={<AppShell />}>
-                  <Route path="/" element={<CommandCenter />} />
-                  <Route path="/monitoring" element={<LiveMonitoring />} />
-                  <Route path="/tracking" element={<SuspectTracking />} />
-                  <Route path="/incidents" element={<Incidents />} />
-                  <Route path="/incidents/:id" element={<IncidentDetail />} />
+                  {/* SIH26127 — Vehicle Intelligence Mission Control */}
+                  <Route path="/" element={<VehicleIntelligence />} />
+                  <Route path="/vehicle-intelligence" element={<VehicleIntelligence />} />
+
+                  {/* Phase 1: Live ANPR Stream */}
+                  <Route path="/live-anpr" element={<LiveANPR />} />
+                  <Route path="/vehicle-intelligence/live-anpr" element={<LiveANPR />} />
+
+                  {/* Phase 4: Vehicle Search & Trajectory Reconstruction */}
+                  <Route path="/search" element={<VehicleSearch />} />
+                  <Route path="/vehicle-search" element={<VehicleSearch />} />
+                  <Route path="/vehicle-intelligence/search" element={<VehicleSearch />} />
+
+                  {/* Phase 3: Cross-Camera Association & Vehicle Re-ID */}
+                  <Route path="/associations" element={<CrossCameraAssociation />} />
+                  <Route path="/cross-camera" element={<CrossCameraAssociation />} />
+                  <Route path="/vehicle-intelligence/associations" element={<CrossCameraAssociation />} />
+
+                  {/* Phase 6: Watchlists & Hotlist Alerts */}
+                  <Route path="/watchlists" element={<Watchlists />} />
+                  <Route path="/vehicle-intelligence/watchlists" element={<Watchlists />} />
+
+                  {/* Phase 5: Urban Traffic Flow & Bottleneck Analytics */}
+                  <Route path="/traffic" element={<TrafficAnalytics />} />
+                  <Route path="/traffic-analytics" element={<TrafficAnalytics />} />
+                  <Route path="/vehicle-intelligence/traffic" element={<TrafficAnalytics />} />
+
+                  {/* Phase 6: Route Anomaly & Plausibility Alerts */}
+                  <Route path="/anomalies" element={<AnomalyAlerts />} />
+                  <Route path="/anomaly-alerts" element={<AnomalyAlerts />} />
+                  <Route path="/vehicle-intelligence/anomalies" element={<AnomalyAlerts />} />
+
+                  {/* Phase 7: ANPR Pipeline Benchmarks & Model Evaluation */}
+                  <Route path="/evaluation" element={<ANPREvaluation />} />
+                  <Route path="/anpr-evaluation" element={<ANPREvaluation />} />
+                  <Route path="/vehicle-intelligence/evaluation" element={<ANPREvaluation />} />
+
+                  {/* Supporting Infrastructure & Forensics */}
+                  <Route path="/cameras" element={<Sources />} />
                   <Route path="/sources" element={<Sources />} />
-                  <Route path="/zones" element={<Zones />} />
-                  <Route path="/rules" element={<Rules />} />
                   <Route path="/evidence" element={<Evidence />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/rocketride" element={<RocketRidePipelines />} />
-                  <Route path="/ai-models" element={<AIModels />} />
                   <Route path="/audit-logs" element={<AuditLogs />} />
                   <Route path="/settings" element={<Settings />} />
                 </Route>
@@ -67,6 +98,4 @@ const App = () => (
   </ErrorBoundary>
 );
 
-
 export default App;
-

@@ -355,8 +355,13 @@ const Evidence: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-white">Evidence Records & Forensic Library</h2>
-          <p className="text-sm text-slate-500">Captured camera snapshots, video clips, and incident evidence archive</p>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white">Vehicle Sighting Evidence & Snapshot Vault</h2>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 border border-sky-500/30 text-sky-300 font-bold">
+              SIH26127 FORENSICS
+            </span>
+          </div>
+          <p className="text-sm text-slate-500">Cryptographically stamped license plate crops, high-speed camera frames, and forensic trajectory recordings</p>
         </div>
         <div className="flex items-center gap-2">
           <button

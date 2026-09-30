@@ -1,12 +1,12 @@
 // src/components/AIOCRScannerModal.tsx
 import React, { useState } from 'react';
 import {
-  Scan, Car, UserCheck, ShieldAlert, CheckCircle, X,
-  Search, ShieldCheck, Zap, Lock, Unlock, AlertTriangle, RefreshCw, Eye, Sparkles
+  Scan, Car, CheckCircle, X,
+  Search, ShieldCheck, Zap, AlertTriangle, RefreshCw, Eye, Sparkles, Filter
 } from 'lucide-react';
 import {
-  LicensePlateRecord, EmployeeBadgeRecord,
-  MOCK_ALPR_LOGS, MOCK_BADGE_LOGS
+  LicensePlateRecord,
+  MOCK_ALPR_LOGS
 } from '@/data/alprBadgeData';
 
 interface AIOCRScannerModalProps {
@@ -18,14 +18,11 @@ export const AIOCRScannerModal: React.FC<AIOCRScannerModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<'alpr' | 'badge'>('alpr');
   const [alprLogs, setAlprLogs] = useState<LicensePlateRecord[]>(MOCK_ALPR_LOGS);
-  const [badgeLogs, setBadgeLogs] = useState<EmployeeBadgeRecord[]>(MOCK_BADGE_LOGS);
   const [searchQuery, setSearchQuery] = useState('');
   const [scanning, setScanning] = useState(false);
   const [manualInput, setManualInput] = useState('');
-  const [gateOpen, setGateOpen] = useState(false);
-  const [gateMessage, setGateMessage] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
   if (!isOpen) return null;
 
@@ -33,235 +30,230 @@ export const AIOCRScannerModal: React.FC<AIOCRScannerModalProps> = ({
     setScanning(true);
     setTimeout(() => {
       setScanning(false);
-      if (activeTab === 'alpr') {
-        const plates = ['TX-994-ARM', 'FL-402-K9X', 'WA-771-V88'];
-        const randomPlate = plates[Math.floor(Math.random() * plates.length)];
-        const newRecord: LicensePlateRecord = {
-          id: `ALPR-${Math.floor(100 + Math.random() * 900)}`,
-          plateNumber: randomPlate,
-          state: 'Texas',
-          vehicleType: 'Executive Fleet / EV Sedan',
-          driverName: 'Verified Contractor Unit',
-          accessStatus: 'authorized',
-          clearanceLevel: 'Gate 01 & Parking Structure',
-          lastSeenLocation: 'Gate 01 — Optical Scanner',
-          timestamp: 'Just now',
-          confidence: 99.2,
-        };
-        setAlprLogs([newRecord, ...alprLogs]);
-      } else {
-        const newBadge: EmployeeBadgeRecord = {
-          badgeId: `EMP-${Math.floor(10000 + Math.random() * 90000)}`,
-          employeeName: 'Elena Rostova',
-          department: 'Cyber Physical Security',
-          role: 'SOC Incident Specialist',
-          clearanceLevel: 'Level 4 (Server Core)',
-          ppeCompliance: 'Compliant (Vest + Helmet)',
-          accessStatus: 'granted',
-          lastScannedGate: 'Main Lobby Turnstile',
-          timestamp: 'Just now',
-          confidence: 98.9,
-        };
-        setBadgeLogs([newBadge, ...badgeLogs]);
-      }
-    }, 900);
+      const indianPlates = [
+        { plate: 'MH12DE1433', state: 'Maharashtra', type: 'White Hyundai Creta', cat: 'SUV', status: 'hotlist_stolen', desc: 'STOLEN VEHICLE BOLO' },
+        { plate: 'DL01CA9999', state: 'Delhi NCR', type: 'Silver Honda City', cat: 'Car', status: 'monitored', desc: 'IMPOSSIBLE SPEED ANOMALY' },
+        { plate: 'KA05MH7890', state: 'Karnataka', type: 'Tata Prima Multi-Axle', cat: 'Commercial Truck', status: 'denied_commercial', desc: 'RESTRICTED FREIGHT' },
+        { plate: 'HR26DQ5555', state: 'Haryana', type: 'Black BMW 330i', cat: 'Car', status: 'monitored', desc: 'SPEED RADAR FLAGGED' },
+        { plate: 'UP16AB2020', state: 'Uttar Pradesh', type: 'Red Maruti Swift', cat: 'Car', status: 'clear', desc: 'VERIFIED TRANSIT' },
+        { plate: 'TN09AZ4321', state: 'Tamil Nadu', type: 'Bajaj RE Auto', cat: 'Auto-Rickshaw', status: 'clear', desc: 'AUTHORIZED TAXI' },
+      ];
+      const pick = indianPlates[Math.floor(Math.random() * indianPlates.length)];
+      const newRecord: LicensePlateRecord = {
+        id: `ANPR-${Math.floor(100 + Math.random() * 900)}`,
+        plateNumber: pick.plate,
+        state: pick.state,
+        vehicleType: pick.type,
+        vehicleCategory: pick.cat as any,
+        accessStatus: pick.status as any,
+        watchlistStatus: pick.desc,
+        lastSeenLocation: 'Camera 01 — MG Road Optical ANPR Lane',
+        timestamp: 'Just now',
+        confidence: Number((93.5 + Math.random() * 6).toFixed(1)),
+      };
+      setAlprLogs([newRecord, ...alprLogs]);
+    }, 600);
   };
 
-  const handleToggleGate = () => {
-    setGateOpen(!gateOpen);
-    setGateMessage(!gateOpen ? 'Access Barrier 01 Opened Successfully' : 'Access Barrier 01 Secured & Locked');
-    setTimeout(() => setGateMessage(null), 3000);
+  const handleManualLookup = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualInput.trim()) return;
+    const cleanPlate = manualInput.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const statePrefix = cleanPlate.substring(0, 2);
+    const stateMap: Record<string, string> = {
+      MH: 'Maharashtra',
+      DL: 'Delhi',
+      KA: 'Karnataka',
+      HR: 'Haryana',
+      UP: 'Uttar Pradesh',
+      TN: 'Tamil Nadu',
+      GJ: 'Gujarat',
+      WB: 'West Bengal',
+      TS: 'Telangana',
+      AP: 'Andhra Pradesh',
+      KL: 'Kerala',
+      RJ: 'Rajasthan',
+    };
+    const newRecord: LicensePlateRecord = {
+      id: `ANPR-MAN-${Math.floor(100 + Math.random() * 900)}`,
+      plateNumber: cleanPlate,
+      state: stateMap[statePrefix] || 'Indian Union Territory / State',
+      vehicleType: 'Manual Forensic Verification Query',
+      vehicleCategory: 'Car',
+      accessStatus: cleanPlate.includes('1433') ? 'hotlist_stolen' : 'clear',
+      watchlistStatus: cleanPlate.includes('1433') ? 'HOTLIST HIT: STOLEN' : 'NO ACTIVE POLICE BOLO',
+      lastSeenLocation: 'Forensic Operator Console',
+      timestamp: 'Just now',
+      confidence: 99.8,
+    };
+    setAlprLogs([newRecord, ...alprLogs]);
+    setManualInput('');
   };
+
+  const filteredLogs = alprLogs.filter((log) => {
+    const matchSearch =
+      log.plateNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      log.state.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      log.vehicleType.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchCategory = activeCategory === 'all' || log.vehicleCategory === activeCategory;
+    return matchSearch && matchCategory;
+  });
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-[#0b1322] border border-sky-500/40 rounded-2xl w-full max-w-5xl shadow-2xl max-h-[92vh] flex flex-col overflow-hidden animate-fade-in text-xs font-mono">
-        {/* Top Header */}
-        <div className="p-4 border-b border-white/10 bg-black/40 flex flex-wrap items-center justify-between gap-3">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="relative w-full max-w-4xl bg-[#09101d] border border-sky-500/30 rounded-2xl shadow-2xl shadow-sky-950/40 overflow-hidden flex flex-col max-h-[90vh]">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08] bg-sky-950/20">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400">
+            <div className="p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400">
               <Scan className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                  AI Optical OCR & Automated License Plate Recognition (ALPR)
+                <h3 className="text-base font-bold text-white tracking-wide">
+                  Live ANPR Diagnostic & Optical OCR Verification
                 </h3>
-                <span className="bg-sky-500/15 text-sky-400 border border-sky-500/30 text-[9px] px-2 py-0.5 rounded-full font-bold">
-                  99.4% OCR Confidence
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-sky-500/20 border border-sky-500/40 text-sky-300 font-bold">
+                  SIH26127
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                Real-time vehicle license plate parsing, BOLO threat flagging, and employee chest badge credentialing.
+              <p className="text-xs text-slate-400 mt-0.5">
+                Indian Standard HSRP Plate Recognition Engine with Multi-Frame Consensus Gating
               </p>
             </div>
           </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
+        {/* Action Bar */}
+        <div className="p-4 border-b border-white/[0.06] bg-white/[0.02] flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <button
-              onClick={handleToggleGate}
-              className={`px-3.5 py-1.5 rounded-lg font-bold flex items-center gap-1.5 transition-all ${
-                gateOpen
-                  ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20'
-                  : 'bg-white/[0.05] hover:bg-white/10 border border-white/10 text-slate-300'
-              }`}
-            >
-              {gateOpen ? <Unlock className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
-              {gateOpen ? 'Barrier 01: OPEN' : 'Actuate Barrier Gate'}
-            </button>
             <button
               onClick={handleSimulateScan}
               disabled={scanning}
-              className="px-3.5 py-1.5 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-lg transition-colors flex items-center gap-1.5 shadow-lg shadow-sky-500/25"
+              className="px-3.5 py-1.5 rounded-lg bg-sky-500/20 border border-sky-500/40 hover:bg-sky-500/30 text-sky-300 text-xs font-mono font-medium flex items-center gap-2 transition-all shadow-sm"
             >
-              {scanning ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
-              {scanning ? 'Targeting OCR…' : 'Trigger Live OCR Scan'}
+              <RefreshCw className={`w-3.5 h-3.5 ${scanning ? 'animate-spin' : ''}`} />
+              {scanning ? 'Segmenting Plate OCR…' : 'Trigger Camera ANPR Ingestion'}
             </button>
-            <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-white transition-colors">
-              <X className="w-4 h-4" />
-            </button>
+
+            <form onSubmit={handleManualLookup} className="flex items-center gap-1.5">
+              <input
+                type="text"
+                placeholder="Manual Plate (e.g. MH12DE1433)…"
+                value={manualInput}
+                onChange={(e) => setManualInput(e.target.value)}
+                className="w-56 bg-white/[0.04] border border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-sky-500/50 uppercase"
+              />
+              <button
+                type="submit"
+                className="px-2.5 py-1.5 rounded-lg bg-white/[0.05] border border-white/10 hover:bg-white/[0.1] text-xs font-mono text-slate-300 transition-colors"
+              >
+                Verify
+              </button>
+            </form>
           </div>
-        </div>
 
-        {gateMessage && (
-          <div className="bg-emerald-500/20 border-b border-emerald-500/40 text-emerald-300 px-4 py-2 text-center font-bold flex items-center justify-center gap-2">
-            <CheckCircle className="w-4 h-4" />
-            <span>{gateMessage}</span>
-          </div>
-        )}
-
-        {/* Tab Switcher */}
-        <div className="px-5 pt-3 border-b border-white/10 bg-[#070e1a] flex gap-4">
-          <button
-            onClick={() => setActiveTab('alpr')}
-            className={`pb-2.5 text-xs font-bold transition-colors border-b-2 flex items-center gap-1.5 ${
-              activeTab === 'alpr'
-                ? 'border-sky-400 text-sky-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Car className="w-3.5 h-3.5" /> Automatic License Plate Recognition (ALPR)
-          </button>
-          <button
-            onClick={() => setActiveTab('badge')}
-            className={`pb-2.5 text-xs font-bold transition-colors border-b-2 flex items-center gap-1.5 ${
-              activeTab === 'badge'
-                ? 'border-sky-400 text-sky-400'
-                : 'border-transparent text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <UserCheck className="w-3.5 h-3.5" /> Personnel ID Badge & PPE Clearance
-          </button>
-        </div>
-
-        {/* Modal Scrollable Body */}
-        <div className="p-5 overflow-y-auto flex-1 space-y-5 bg-[#09111e]">
-          {/* TAB 1: ALPR */}
-          {activeTab === 'alpr' && (
-            <div className="space-y-4">
-              {/* ALPR Video Optical Target HUD Simulation */}
-              <div className="bg-[#050b14] border border-sky-500/30 rounded-2xl p-4 relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="relative w-full md:w-72 h-36 bg-black/60 rounded-xl border border-sky-500/40 flex items-center justify-center overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-b from-sky-500/10 to-transparent pointer-events-none" />
-                  {/* Laser scan line */}
-                  <div className="absolute left-0 right-0 h-0.5 bg-sky-400 shadow-[0_0_12px_#38bdf8] animate-bounce pointer-events-none" />
-                  
-                  {/* Bounding box */}
-                  <div className="border-2 border-emerald-400 bg-emerald-500/10 px-4 py-2 rounded text-center">
-                    <span className="text-[9px] text-emerald-400 block uppercase font-mono font-bold">PLATE LOCK [99.2%]</span>
-                    <span className="text-xl font-bold text-white tracking-widest font-mono">TX-792-KLR</span>
-                  </div>
-                </div>
-
-                <div className="flex-1 space-y-2 text-[11px]">
-                  <div className="flex items-center gap-2 text-white font-bold">
-                    <CheckCircle className="w-4 h-4 text-emerald-400" />
-                    <span>Active Camera 01 (Gate Entrance) — ALPR Optical Telemetry</span>
-                  </div>
-                  <p className="text-slate-400 leading-relaxed">
-                    AI model continuously parses character glyphs, state issuing identifiers, and vehicle make/color signatures. Automatically cross-references security whitelist and active BOLO alerts.
-                  </p>
-                  <div className="flex items-center gap-4 text-slate-300 pt-1 font-mono text-[10px]">
-                    <span>Plate Standard: <strong className="text-sky-300">USA (50 States)</strong></span>
-                    <span>Frame Rate: <strong className="text-white">60 FPS</strong></span>
-                    <span>Status: <strong className="text-emerald-400">BARRIER AUTO-ACTUATION ARMED</strong></span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Log Table */}
-              <div className="border border-white/10 rounded-xl overflow-hidden bg-[#070d18]">
-                <table className="w-full text-left text-[11px]">
-                  <thead>
-                    <tr className="bg-black/60 border-b border-white/10 text-slate-400 text-[10px] uppercase">
-                      <th className="p-2.5">Plate Number</th>
-                      <th className="p-2.5">Vehicle Type</th>
-                      <th className="p-2.5">Registered To</th>
-                      <th className="p-2.5">Clearance / Status</th>
-                      <th className="p-2.5">Location</th>
-                      <th className="p-2.5">Confidence</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/[0.05]">
-                    {alprLogs.map((log) => (
-                      <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="p-2.5 font-bold text-sky-400 font-mono tracking-wider">{log.plateNumber}</td>
-                        <td className="p-2.5 text-white">{log.vehicleType}</td>
-                        <td className="p-2.5 text-slate-300">{log.driverName}</td>
-                        <td className="p-2.5">
-                          <span
-                            className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
-                              log.accessStatus === 'authorized'
-                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                                : log.accessStatus === 'flagged'
-                                ? 'bg-red-500/20 text-red-400 border border-red-500/30 animate-pulse'
-                                : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                            }`}
-                          >
-                            {log.accessStatus === 'flagged' ? '🚨 BOLO ALERT' : log.accessStatus}
-                          </span>
-                        </td>
-                        <td className="p-2.5 text-slate-400">{log.lastSeenLocation}</td>
-                        <td className="p-2.5 text-emerald-400 font-mono font-bold">{log.confidence}%</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Filter results…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-40 bg-white/[0.04] border border-white/10 rounded-lg pl-8 pr-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500/50"
+              />
             </div>
-          )}
+          </div>
+        </div>
 
-          {/* TAB 2: Personnel Badge */}
-          {activeTab === 'badge' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {badgeLogs.map((badge) => (
-                  <div
-                    key={badge.badgeId}
-                    className="p-4 bg-[#0c1626] border border-white/10 rounded-2xl space-y-2.5"
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-sky-400 text-xs font-mono">{badge.badgeId}</span>
-                      <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold text-[9px]">
-                        {badge.accessStatus.toUpperCase()}
-                      </span>
+        {/* Results Stream */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+          {filteredLogs.length === 0 ? (
+            <div className="text-center py-12 text-slate-500 text-xs font-mono">
+              No matching ANPR observations recorded in this diagnostic session.
+            </div>
+          ) : (
+            filteredLogs.map((log) => {
+              const isHotlist = log.accessStatus === 'hotlist_stolen';
+              const isCommercialDenied = log.accessStatus === 'denied_commercial';
+              return (
+                <div
+                  key={log.id}
+                  className={`p-3.5 rounded-xl border transition-all flex flex-wrap items-center justify-between gap-3 ${
+                    isHotlist
+                      ? 'bg-red-500/10 border-red-500/30'
+                      : isCommercialDenied
+                      ? 'bg-amber-500/10 border-amber-500/30'
+                      : 'bg-white/[0.03] border-white/[0.07] hover:border-sky-500/30'
+                  }`}
+                >
+                  <div className="flex items-center gap-3.5">
+                    {/* Simulated High-Contrast Indian Plate Display */}
+                    <div className="px-3 py-1.5 rounded-md bg-amber-400/90 text-slate-950 font-mono font-black text-sm tracking-wider border-2 border-slate-900 shadow-sm flex items-center gap-2">
+                      <span className="text-[9px] bg-slate-900 text-white px-1 py-0.5 rounded font-bold">IND</span>
+                      <span>{log.plateNumber}</span>
                     </div>
 
                     <div>
-                      <div className="text-white font-bold text-sm">{badge.employeeName}</div>
-                      <div className="text-slate-400 text-[10px]">{badge.role} · {badge.department}</div>
-                    </div>
-
-                    <div className="pt-2 border-t border-white/[0.05] space-y-1 text-[10px] text-slate-300">
-                      <div>Clearance: <span className="text-sky-300 font-bold">{badge.clearanceLevel}</span></div>
-                      <div>PPE Check: <span className="text-emerald-400 font-bold">{badge.ppeCompliance}</span></div>
-                      <div className="text-slate-500">{badge.lastScannedGate} · {badge.timestamp}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-white">{log.vehicleType}</span>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/[0.06] text-slate-300">
+                          {log.vehicleCategory}
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-400">({log.state})</span>
+                      </div>
+                      <div className="flex items-center gap-3 mt-1 text-[11px] text-slate-400 font-mono">
+                        <span>{log.lastSeenLocation}</span>
+                        <span>•</span>
+                        <span>{log.timestamp}</span>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+
+                  <div className="flex items-center gap-4">
+                    {/* Confidence */}
+                    <div className="text-right">
+                      <div className="text-[10px] font-mono text-slate-400">OCR Consensus</div>
+                      <div className={`text-xs font-mono font-bold ${log.confidence >= 90 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                        {log.confidence}%
+                      </div>
+                    </div>
+
+                    {/* Status Pill */}
+                    <div className="flex flex-col items-end">
+                      <span
+                        className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border ${
+                          isHotlist
+                            ? 'bg-red-500/20 text-red-300 border-red-500/40 animate-pulse'
+                            : isCommercialDenied
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                            : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                        }`}
+                      >
+                        {log.watchlistStatus}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
           )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-3 border-t border-white/[0.08] bg-[#070c16] flex items-center justify-between text-[11px] font-mono text-slate-500">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>OCR Consensus Buffer: Ready • Indian State Regex Engine Active</span>
+          </div>
+          <div>Total Detections Logged: {filteredLogs.length}</div>
         </div>
       </div>
     </div>

@@ -1,1 +1,0 @@
-export default function RiskChart(){ return <div style={{padding:12}}>Risk chart placeholder (install recharts to use)</div> }

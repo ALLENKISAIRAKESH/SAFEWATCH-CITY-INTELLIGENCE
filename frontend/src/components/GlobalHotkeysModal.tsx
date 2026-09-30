@@ -1,44 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Keyboard, Sparkles, AlertOctagon, FileText, Video,
-  LayoutDashboard, Crosshair, AlertTriangle, Shield,
-  FileImage, BarChart3, Settings, X, Command
+  Keyboard, Sparkles, ScanLine, Search, GitBranch,
+  LayoutDashboard, AlertTriangle, Shield,
+  FileImage, BarChart3, Camera, X, Gauge
 } from 'lucide-react';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onOpenDemo: () => void;
-  onOpenLockdown: () => void;
-  onOpenShift: () => void;
 }
 
 export const SHORTCUTS = [
-  { key: 'D', label: 'Open Hackathon Demo Controller', icon: Sparkles, color: 'text-amber-400' },
-  { key: 'L', label: 'Trigger Emergency Lockdown Red Alert', icon: AlertOctagon, color: 'text-red-400' },
-  { key: 'S', label: 'Open SOC Shift Handover Modal', icon: FileText, color: 'text-sky-400' },
-  { key: 'M', label: 'Navigate to Live Monitoring (Camera Wall)', icon: Video, color: 'text-emerald-400' },
-  { key: 'O / C', label: 'Navigate to Command Center Overview', icon: LayoutDashboard, color: 'text-sky-400' },
-  { key: 'T', label: 'Navigate to Suspect Re-ID Trajectory', icon: Crosshair, color: 'text-purple-400' },
-  { key: 'I', label: 'Navigate to Incidents Triage Queue', icon: AlertTriangle, color: 'text-amber-400' },
-  { key: 'E', label: 'Navigate to Forensic Evidence Vault', icon: FileImage, color: 'text-blue-400' },
-  { key: 'A', label: 'Navigate to Safety Analytics & Reports', icon: BarChart3, color: 'text-cyan-400' },
-  { key: '?', label: 'Toggle this Hotkeys HUD Guide', icon: Keyboard, color: 'text-slate-300' },
+  { key: 'D', label: 'Open SIH26127 Pitch Demo Controller', icon: Sparkles, color: 'text-amber-400' },
+  { key: 'M', label: 'Navigate to Mission Control Overview', icon: LayoutDashboard, color: 'text-sky-400' },
+  { key: 'L', label: 'Navigate to Live ANPR Stream', icon: ScanLine, color: 'text-emerald-400' },
+  { key: 'S', label: 'Navigate to Vehicle Search & Journey', icon: Search, color: 'text-sky-400' },
+  { key: 'A', label: 'Navigate to Cross-Camera Associations', icon: GitBranch, color: 'text-purple-400' },
+  { key: 'W', label: 'Navigate to Watchlists & Hotlist Alerts', icon: Shield, color: 'text-red-400' },
+  { key: 'T', label: 'Navigate to Urban Traffic Analytics', icon: BarChart3, color: 'text-cyan-400' },
+  { key: 'R', label: 'Navigate to Route Anomaly Alerts', icon: AlertTriangle, color: 'text-amber-400' },
+  { key: 'E', label: 'Navigate to ANPR Benchmarks & Eval', icon: Gauge, color: 'text-blue-400' },
+  { key: 'C', label: 'Navigate to Traffic Camera Network', icon: Camera, color: 'text-slate-300' },
+  { key: 'V', label: 'Navigate to Forensic Evidence Vault', icon: FileImage, color: 'text-indigo-400' },
+  { key: '?', label: 'Toggle this Hotkeys HUD Guide', icon: Keyboard, color: 'text-slate-400' },
 ];
 
 const GlobalHotkeysModal: React.FC<Props> = ({
   isOpen,
   onClose,
   onOpenDemo,
-  onOpenLockdown,
-  onOpenShift,
 }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore when typing inside input fields, textareas, or selects
       const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
 
@@ -46,7 +43,7 @@ const GlobalHotkeysModal: React.FC<Props> = ({
 
       if (e.key === '?' || (e.ctrlKey && key === 'k')) {
         e.preventDefault();
-        isOpen ? onClose() : onOpenDemo(); // or toggle
+        isOpen ? onClose() : onOpenDemo();
         return;
       }
 
@@ -59,32 +56,32 @@ const GlobalHotkeysModal: React.FC<Props> = ({
         e.preventDefault();
         onClose();
         onOpenDemo();
-      } else if (key === 'l') {
-        e.preventDefault();
-        onClose();
-        onOpenLockdown();
-      } else if (key === 's') {
-        e.preventDefault();
-        onClose();
-        onOpenShift();
       } else if (key === 'm') {
-        navigate('/monitoring');
-      } else if (key === 'o' || key === 'c') {
         navigate('/');
-      } else if (key === 't') {
-        navigate('/tracking');
-      } else if (key === 'i') {
-        navigate('/incidents');
-      } else if (key === 'e') {
-        navigate('/evidence');
+      } else if (key === 'l') {
+        navigate('/live-anpr');
+      } else if (key === 's') {
+        navigate('/search');
       } else if (key === 'a') {
-        navigate('/analytics');
+        navigate('/associations');
+      } else if (key === 'w') {
+        navigate('/watchlists');
+      } else if (key === 't') {
+        navigate('/traffic');
+      } else if (key === 'r') {
+        navigate('/anomalies');
+      } else if (key === 'e') {
+        navigate('/evaluation');
+      } else if (key === 'c') {
+        navigate('/cameras');
+      } else if (key === 'v') {
+        navigate('/evidence');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose, onOpenDemo, onOpenLockdown, onOpenShift, navigate]);
+  }, [isOpen, onClose, onOpenDemo, navigate]);
 
   if (!isOpen) return null;
 
@@ -98,8 +95,8 @@ const GlobalHotkeysModal: React.FC<Props> = ({
               <Keyboard className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white leading-tight">Mission Control Hotkeys HUD</h2>
-              <p className="text-[11px] text-slate-400">Quick Keyboard Navigation & Simulation Triggers</p>
+              <h2 className="text-base font-bold text-white leading-tight">SIH26127 Hotkeys HUD</h2>
+              <p className="text-[11px] text-slate-400">Rapid Navigation & Vehicle Demo Controls</p>
             </div>
           </div>
           <button onClick={onClose} className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors">
@@ -127,7 +124,7 @@ const GlobalHotkeysModal: React.FC<Props> = ({
 
         {/* Footer */}
         <div className="px-5 py-3 bg-black/40 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
-          <span>Press any key to execute or <kbd className="text-white px-1 bg-white/10 rounded">Esc</kbd> to exit</span>
+          <span>Press shortcut key or <kbd className="text-white px-1 bg-white/10 rounded">Esc</kbd> to exit</span>
           <button
             onClick={onClose}
             className="px-3.5 py-1 bg-white/10 hover:bg-white/15 text-white font-medium rounded-lg transition-colors"
